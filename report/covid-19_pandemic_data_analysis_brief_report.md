@@ -51,7 +51,7 @@ The data exploration stage has helped to identify some potential areas that need
 -   Unnecessary "NULL" values: These values are converted to zero using the IFNULL() function.
 -   Data repetition: Country and Continent-based observations clubbed together. The covid_cases and covid_vaccines table consists only Country-based observations.
     -   This was done by adding the WHERE clause: continent IS NOT null.
--   All vaccine types under one attribute: The comma-separated vaccines types were separated into individual columns using "Text-to-columns" option. To indicate if a country has used a specific vaccine type, IF() function has been used. Example: =IF(A2 = "<vaccine type>";1;0) ![Vaccine type usage indication](if_function_vaccine_types.png)
+-   All vaccine types under one attribute: The comma-separated vaccines types were separated into individual columns using "Text-to-columns" option. To indicate if a country has used a specific vaccine type, IF() function has been used. Example: =IF(A2 = "<vaccine type>";1;0) ![Vaccine type usage indication](E:/GitHub/covid19-pandemic-data-analysis/report/screenshots/if_function_vaccine_types.png)
 
 Definition of each attribute in the tables can be found here:
 

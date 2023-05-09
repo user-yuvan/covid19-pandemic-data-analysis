@@ -1,0 +1,110 @@
+-- daywise total_death percentage calculation
+SELECT
+  location,
+  date,
+  total_cases,
+  total_deaths,
+  population,
+  ROUND((total_deaths/total_cases)*100, 4) AS total_death_percent
+FROM
+  `my-project-bigquery-372222.covid_data.covid_cases`
+ORDER BY
+  date
+
+
+-- daywise new_cases percentage calculation
+SELECT
+  location,
+  date,
+  IFNULL(new_cases, 0) AS new_cases,
+  IFNULL(total_cases, 0) AS total_cases,
+  population,
+  IFNULL(ROUND((total_cases/population)*100, 4), 0) AS total_cases_percent
+FROM
+  `my-project-bigquery-372222.covid_data.covid_cases`
+ORDER BY
+  total_cases_percent DESC
+
+
+-- countries with highest total_cases percent
+SELECT
+  location,
+  population,
+  date,
+  MAX(total_cases) AS max_cases,
+  ROUND(MAX(total_cases/population)*100, 4) AS highest_total_cases_percent
+FROM
+  `my-project-bigquery-372222.covid_data.covid_cases`
+GROUP BY
+  location,
+  population,
+  date
+ORDER BY
+  highest_total_cases_percent DESC
+
+
+-- total deaths and cases in all countries
+SELECT
+  continent,
+  location,
+  population,
+  IFNULL(SUM(new_deaths), 0) AS total_deaths,
+  IFNULL(SUM(new_cases), 0) AS total_cases,
+  IFNULL(ROUND(SUM(new_deaths/population)*100, 4), 0) AS total_deaths_percent,
+  IFNULL(ROUND(SUM(new_cases/population)*100, 4), 0) AS total_cases_percent
+FROM
+  `my-project-bigquery-372222.covid_data.covid_cases`
+GROUP BY
+  continent,
+  location,
+  population
+ORDER BY
+  total_cases DESC
+
+
+-- continent-wise total deaths
+SELECT
+  continent,
+  SUM(new_deaths) AS continent_total_deaths, 
+FROM
+  `my-project-bigquery-372222.covid_data.covid_cases`
+GROUP BY
+  continent
+
+
+-- total cases, total deaths, total population, percentage of total deaths
+SELECT
+  population,
+  SUM(new_cases) AS world_cases,
+  SUM(new_deaths) AS world_deaths,
+  ROUND((SUM(new_deaths)/SUM(new_cases))*100, 4) AS world_deaths_percent
+FROM
+  `my-project-bigquery-372222.covid_data.covid_all_data`
+WHERE
+  location = "World"
+GROUP BY
+  population
+
+
+-- total vaccinations in all countries
+SELECT
+  covid_vaccines.continent,
+  covid_cases.location,
+  covid_vaccines.population,
+  IFNULL(MAX(covid_vaccines.total_vaccinations), 0) AS total_vaccinations,
+  IFNULL(MAX(covid_vaccines.people_vaccinated), 0) AS one_dose_vaccination_total,
+  IFNULL(MAX(covid_vaccines.people_fully_vaccinated), 0) AS all_doses_vaccination_total,
+  IFNULL(MAX(covid_cases.total_cases), 0) AS total_cases,
+  IFNULL(ROUND(MAX(covid_vaccines.people_vaccinated/covid_vaccines.population)*100, 4), 0) AS one_dose_vaccination_percent
+FROM
+  `my-project-bigquery-372222.covid_data.covid_vaccines` AS covid_vaccines
+JOIN
+  `my-project-bigquery-372222.covid_data.covid_cases` AS covid_cases
+ON covid_cases.date = covid_vaccines.date
+AND covid_cases.location = covid_vaccines.location
+GROUP BY
+  continent,
+  location,
+  population
+ORDER BY
+  location
